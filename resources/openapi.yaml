@@ -1,0 +1,2033 @@
+openapi: 3.0.3
+info:
+  description: Services that provides the capabilities for orders and Odoo
+  title: Order Service
+  version: "1.0"
+servers:
+- description: Inferred Url
+  url: http://localhost:9000
+tags:
+- description: Internal Order Controller
+  name: Order APIs
+- description: Odoo Controller
+  name: odoo-controller
+paths:
+  /order/v1/internal/ranger/create:
+    post:
+      operationId: createRangerOrderUsingPOST
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RangerCreateOrderCommand'
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BaseResponseOfOrder'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Internal Server Error
+      security:
+      - Authorization:
+        - global
+      summary: createRangerOrder
+      tags:
+      - Order APIs
+  /order/ship/{carrier}:
+    post:
+      operationId: createShipUsingPOST
+      parameters:
+      - description: carrier
+        explode: false
+        in: path
+        name: carrier
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OdooCreateShipCommand'
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PilotResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Internal Server Error
+      security:
+      - Authorization:
+        - global
+      summary: createShip
+      tags:
+      - odoo-controller
+  /order/{storeId}:
+    get:
+      operationId: odooUsingGET
+      parameters:
+      - description: storeId
+        explode: false
+        in: path
+        name: storeId
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: type
+        explode: true
+        in: query
+        name: type
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: status
+        explode: true
+        in: query
+        name: status
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: order_id
+        explode: true
+        in: query
+        name: order_id
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: client_order_ref
+        explode: true
+        in: query
+        name: client_order_ref
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: combine_orders
+        explode: true
+        in: query
+        name: combine_orders
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: created_range
+        explode: true
+        in: query
+        name: created_range
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: updated_range
+        explode: true
+        in: query
+        name: updated_range
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: page_no
+        explode: true
+        in: query
+        name: page_no
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: page_size
+        explode: true
+        in: query
+        name: page_size
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OdooResponse'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Bad Request
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseResponse'
+          description: Internal Server Error
+      security:
+      - Authorization:
+        - global
+      summary: odoo
+      tags:
+      - odoo-controller
+components:
+  schemas:
+    BaseResponse:
+      description: Common Response payload
+      properties:
+        code:
+          description: code 200/500
+          format: int32
+          type: integer
+        data:
+          description: wrapped data
+          type: object
+        msg:
+          description: error message
+          type: string
+        traceId:
+          type: string
+      title: BaseResponse
+      type: object
+    BaseResponseOfOrder:
+      description: Common Response payload
+      example:
+        msg: msg
+        traceId: traceId
+        code: 0
+        data:
+          deliveryPhone: deliveryPhone
+          productTax: 7
+          totalProductAmount: 4
+          successRedirectUrl: successRedirectUrl
+          outerUserId: outerUserId
+          deliveryEmail: deliveryEmail
+          deliveryWaybillId: deliveryWaybillId
+          discount: 2
+          couponInstanceId: 5
+          platform: platform
+          addressId: 6
+          createTimestamp: createTimestamp
+          products:
+          - quantity: 2
+            productId: productId
+            discount: 9
+            tax: 7
+            productName: productName
+            spec: spec
+            rrp: 4
+            taxRate: 1.2315135367772556
+            outerProductId: outerProductId
+            outerSkuId: outerSkuId
+            price: 3
+            imageUrl: imageUrl
+            currency: currency
+            barcode: barcode
+            skuId: skuId
+          - quantity: 2
+            productId: productId
+            discount: 9
+            tax: 7
+            productName: productName
+            spec: spec
+            rrp: 4
+            taxRate: 1.2315135367772556
+            outerProductId: outerProductId
+            outerSkuId: outerSkuId
+            price: 3
+            imageUrl: imageUrl
+            currency: currency
+            barcode: barcode
+            skuId: skuId
+          deliveryUserIdCard: deliveryUserIdCard
+          outerOrderId: outerOrderId
+          shippingTax: 1
+          total: 1
+          deliveryAddress: deliveryAddress
+          parentOrderId: parentOrderId
+          customsClearanceType: customsClearanceType
+          currency: currency
+          id: id
+          declareUserName: declareUserName
+          deliveryCarrierId: deliveryCarrierId
+          deliveryPhoneCountryCode: deliveryPhoneCountryCode
+          campaignId: 5
+          cartId: cartId
+          campaignTrackingData: campaignTrackingData
+          deliveryExpressCompany: deliveryExpressCompany
+          tax: 7
+          storeId: storeId
+          userId: userId
+          updateTimestamp: updateTimestamp
+          paidTimestamp: paidTimestamp
+          cancelUrl: cancelUrl
+          areaId: 1
+          deliveryUserName: deliveryUserName
+          discountCode: discountCode
+          shippingFee: 1
+          notifyUrl: notifyUrl
+          comment: comment
+          status: 6
+      properties:
+        code:
+          description: code 200/500
+          format: int32
+          type: integer
+        data:
+          $ref: '#/components/schemas/Order'
+        msg:
+          description: error message
+          type: string
+        traceId:
+          type: string
+      title: BaseResponseOfOrder
+      type: object
+    Customer:
+      example:
+        zip: zip
+        country: country
+        firstName: firstName
+        lastName: lastName
+        address2: address2
+        city: city
+        phone: phone
+        address1: address1
+        countryCode: countryCode
+        state: state
+        email: email
+      properties:
+        address1:
+          type: string
+        address2:
+          type: string
+        city:
+          type: string
+        country:
+          type: string
+        countryCode:
+          type: string
+        email:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        phone:
+          type: string
+        state:
+          type: string
+        zip:
+          type: string
+      title: Customer
+      type: object
+    Dimension:
+      example:
+        length: 6.027456183070403
+        width: 5.962133916683182
+        weight: 1.4658129805029452
+        height: 0.8008281904610115
+      properties:
+        height:
+          format: double
+          type: number
+        length:
+          format: double
+          type: number
+        weight:
+          format: double
+          type: number
+        width:
+          format: double
+          type: number
+      title: Dimension
+      type: object
+    EnvoyItemDTO:
+      example:
+        customsUnitCodeWeight: customsUnitCodeWeight
+        quantity: 3
+        quantityUom: quantityUom
+        nameCn: nameCn
+        tax: 2.027123023002322
+        customsUnitCode: customsUnitCode
+        spec: spec
+        grossWeight: 2.3021358869347655
+        netWeight: 7.061401241503109
+        customsFilingId: customsFilingId
+        hsCode: hsCode
+        skuNumber: skuNumber
+        price: 9.301444243932576
+        name: name
+        ingredients: ingredients
+        model: model
+        countryOfOrigin: countryOfOrigin
+        customsUnitCodePackage: customsUnitCodePackage
+        declarationElements: declarationElements
+        barcode: barcode
+        brand: brand
+      properties:
+        barcode:
+          type: string
+        brand:
+          type: string
+        countryOfOrigin:
+          type: string
+        customsFilingId:
+          type: string
+        customsUnitCode:
+          type: string
+        customsUnitCodePackage:
+          type: string
+        customsUnitCodeWeight:
+          type: string
+        declarationElements:
+          type: string
+        grossWeight:
+          format: double
+          type: number
+        hsCode:
+          type: string
+        ingredients:
+          type: string
+        model:
+          type: string
+        name:
+          type: string
+        nameCn:
+          type: string
+        netWeight:
+          format: double
+          type: number
+        price:
+          format: double
+          type: number
+        quantity:
+          format: int32
+          type: integer
+        quantityUom:
+          type: string
+        skuNumber:
+          type: string
+        spec:
+          type: string
+        tax:
+          format: double
+          type: number
+      title: EnvoyItemDTO
+      type: object
+    Item:
+      example:
+        product:
+          country: "{}"
+          skus:
+          - skuNumber: skuNumber
+            barcode: barcode
+          - skuNumber: skuNumber
+            barcode: barcode
+          description: "{}"
+          discount: "{}"
+          massUnit: massUnit
+          spec: "{}"
+          createdAt: "{}"
+          warrantyPeriod: 6
+          personalPostalArticlesTax: "{}"
+          price: "{}"
+          vendor: "{}"
+          logisticsMode: "{}"
+          currency: currency
+          model: "{}"
+          shippingTime: "{}"
+          shelfLife: "{}"
+          barcode: barcode
+          brand: brand
+          timeUnit: "{}"
+          updatedAt: "{}"
+          images: "{}"
+          ingredient: "{}"
+          shippingCost: "{}"
+          productId: productId
+          expressType: "{}"
+          isOnsale: "{}"
+          nameEn: "{}"
+          storeId: "{}"
+          rrp: "{}"
+          taxRate: "{}"
+          grossWeight: "{}"
+          netWeight: "{}"
+          hsCode: "{}"
+          name: "{}"
+          category: "{}"
+          groupBuyingPrice: "{}"
+          categoryId: "{}"
+          status: status
+        quantity: 1
+        price: 0.8008281904610115
+        discount: "{}"
+        tax: "{}"
+      properties:
+        discount:
+          type: object
+        price:
+          format: double
+          type: number
+        product:
+          $ref: '#/components/schemas/Product'
+        quantity:
+          format: int32
+          type: integer
+        tax:
+          type: object
+      title: Item
+      type: object
+    LoadData:
+      example:
+        trackingReference: trackingReference
+        trackingUrl: trackingUrl
+        waybillId: waybillId
+        deliverySlipUrl: deliverySlipUrl
+        domesticDeliveryCompany: domesticDeliveryCompany
+        deliveryStatus: deliveryStatus
+      properties:
+        deliverySlipUrl:
+          type: string
+        deliveryStatus:
+          type: string
+        domesticDeliveryCompany:
+          type: string
+        trackingReference:
+          type: string
+        trackingUrl:
+          type: string
+        waybillId:
+          type: string
+      title: LoadData
+      type: object
+    OdooCreateShipCommand:
+      example:
+        trackingReference: trackingReference
+        grossWeight: 5.637376656633329
+        netWeight: 4.145608029883936
+        orderTime: orderTime
+        orderRef: orderRef
+        merchantOrderRef: merchantOrderRef
+        expressCompany: expressCompany
+        sellerOrderRef: sellerOrderRef
+        dimension:
+          length: 6.027456183070403
+          width: 5.962133916683182
+          weight: 1.4658129805029452
+          height: 0.8008281904610115
+        items:
+        - customsUnitCodeWeight: customsUnitCodeWeight
+          quantity: 3
+          quantityUom: quantityUom
+          nameCn: nameCn
+          tax: 2.027123023002322
+          customsUnitCode: customsUnitCode
+          spec: spec
+          grossWeight: 2.3021358869347655
+          netWeight: 7.061401241503109
+          customsFilingId: customsFilingId
+          hsCode: hsCode
+          skuNumber: skuNumber
+          price: 9.301444243932576
+          name: name
+          ingredients: ingredients
+          model: model
+          countryOfOrigin: countryOfOrigin
+          customsUnitCodePackage: customsUnitCodePackage
+          declarationElements: declarationElements
+          barcode: barcode
+          brand: brand
+        - customsUnitCodeWeight: customsUnitCodeWeight
+          quantity: 3
+          quantityUom: quantityUom
+          nameCn: nameCn
+          tax: 2.027123023002322
+          customsUnitCode: customsUnitCode
+          spec: spec
+          grossWeight: 2.3021358869347655
+          netWeight: 7.061401241503109
+          customsFilingId: customsFilingId
+          hsCode: hsCode
+          skuNumber: skuNumber
+          price: 9.301444243932576
+          name: name
+          ingredients: ingredients
+          model: model
+          countryOfOrigin: countryOfOrigin
+          customsUnitCodePackage: customsUnitCodePackage
+          declarationElements: declarationElements
+          barcode: barcode
+          brand: brand
+      properties:
+        dimension:
+          $ref: '#/components/schemas/Dimension'
+        expressCompany:
+          type: string
+        grossWeight:
+          format: double
+          type: number
+        items:
+          items:
+            $ref: '#/components/schemas/EnvoyItemDTO'
+          type: array
+        merchantOrderRef:
+          type: string
+        netWeight:
+          format: double
+          type: number
+        orderRef:
+          type: string
+        orderTime:
+          type: string
+        sellerOrderRef:
+          type: string
+        trackingReference:
+          type: string
+      title: OdooCreateShipCommand
+      type: object
+    OdooResponse:
+      example:
+        code: 0
+        data:
+          orders:
+          - seller: "{}"
+            trackingReference: "{}"
+            orderType: orderType
+            orderId: "{}"
+            payMerchantName: "{}"
+            customerIdRef: "{}"
+            payer: "{}"
+            createdAt: createdAt
+            distributorName: "{}"
+            payAmount: 6.027456183070403
+            isDistributionOrder: true
+            payMethod: "{}"
+            customerNote: "{}"
+            expressCompany: "{}"
+            isSubOrder: true
+            currency: currency
+            platformName: platformName
+            updatedAt: updatedAt
+            shippingCost: "{}"
+            platformTransactionId: "{}"
+            expressType: "{}"
+            nodeCode: "{}"
+            clientParentOrderRef: "{}"
+            deliverySlipUrl: "{}"
+            payCustomsNo: "{}"
+            clientOrderRef: clientOrderRef
+            destinationCode: "{}"
+            customsFilingId: "{}"
+            insuranceFee: "{}"
+            productsTotalTax: 1.4658129805029452
+            paymentPayId: "{}"
+            paidAt: "{}"
+            payId: "{}"
+            items:
+            - product:
+                country: "{}"
+                skus:
+                - skuNumber: skuNumber
+                  barcode: barcode
+                - skuNumber: skuNumber
+                  barcode: barcode
+                description: "{}"
+                discount: "{}"
+                massUnit: massUnit
+                spec: "{}"
+                createdAt: "{}"
+                warrantyPeriod: 6
+                personalPostalArticlesTax: "{}"
+                price: "{}"
+                vendor: "{}"
+                logisticsMode: "{}"
+                currency: currency
+                model: "{}"
+                shippingTime: "{}"
+                shelfLife: "{}"
+                barcode: barcode
+                brand: brand
+                timeUnit: "{}"
+                updatedAt: "{}"
+                images: "{}"
+                ingredient: "{}"
+                shippingCost: "{}"
+                productId: productId
+                expressType: "{}"
+                isOnsale: "{}"
+                nameEn: "{}"
+                storeId: "{}"
+                rrp: "{}"
+                taxRate: "{}"
+                grossWeight: "{}"
+                netWeight: "{}"
+                hsCode: "{}"
+                name: "{}"
+                category: "{}"
+                groupBuyingPrice: "{}"
+                categoryId: "{}"
+                status: status
+              quantity: 1
+              price: 0.8008281904610115
+              discount: "{}"
+              tax: "{}"
+            - product:
+                country: "{}"
+                skus:
+                - skuNumber: skuNumber
+                  barcode: barcode
+                - skuNumber: skuNumber
+                  barcode: barcode
+                description: "{}"
+                discount: "{}"
+                massUnit: massUnit
+                spec: "{}"
+                createdAt: "{}"
+                warrantyPeriod: 6
+                personalPostalArticlesTax: "{}"
+                price: "{}"
+                vendor: "{}"
+                logisticsMode: "{}"
+                currency: currency
+                model: "{}"
+                shippingTime: "{}"
+                shelfLife: "{}"
+                barcode: barcode
+                brand: brand
+                timeUnit: "{}"
+                updatedAt: "{}"
+                images: "{}"
+                ingredient: "{}"
+                shippingCost: "{}"
+                productId: productId
+                expressType: "{}"
+                isOnsale: "{}"
+                nameEn: "{}"
+                storeId: "{}"
+                rrp: "{}"
+                taxRate: "{}"
+                grossWeight: "{}"
+                netWeight: "{}"
+                hsCode: "{}"
+                name: "{}"
+                category: "{}"
+                groupBuyingPrice: "{}"
+                categoryId: "{}"
+                status: status
+              quantity: 1
+              price: 0.8008281904610115
+              discount: "{}"
+              tax: "{}"
+            customer: "{}"
+            customsCode: customsCode
+            nonCashDeductionAmount: "{}"
+            status: status
+          - seller: "{}"
+            trackingReference: "{}"
+            orderType: orderType
+            orderId: "{}"
+            payMerchantName: "{}"
+            customerIdRef: "{}"
+            payer: "{}"
+            createdAt: createdAt
+            distributorName: "{}"
+            payAmount: 6.027456183070403
+            isDistributionOrder: true
+            payMethod: "{}"
+            customerNote: "{}"
+            expressCompany: "{}"
+            isSubOrder: true
+            currency: currency
+            platformName: platformName
+            updatedAt: updatedAt
+            shippingCost: "{}"
+            platformTransactionId: "{}"
+            expressType: "{}"
+            nodeCode: "{}"
+            clientParentOrderRef: "{}"
+            deliverySlipUrl: "{}"
+            payCustomsNo: "{}"
+            clientOrderRef: clientOrderRef
+            destinationCode: "{}"
+            customsFilingId: "{}"
+            insuranceFee: "{}"
+            productsTotalTax: 1.4658129805029452
+            paymentPayId: "{}"
+            paidAt: "{}"
+            payId: "{}"
+            items:
+            - product:
+                country: "{}"
+                skus:
+                - skuNumber: skuNumber
+                  barcode: barcode
+                - skuNumber: skuNumber
+                  barcode: barcode
+                description: "{}"
+                discount: "{}"
+                massUnit: massUnit
+                spec: "{}"
+                createdAt: "{}"
+                warrantyPeriod: 6
+                personalPostalArticlesTax: "{}"
+                price: "{}"
+                vendor: "{}"
+                logisticsMode: "{}"
+                currency: currency
+                model: "{}"
+                shippingTime: "{}"
+                shelfLife: "{}"
+                barcode: barcode
+                brand: brand
+                timeUnit: "{}"
+                updatedAt: "{}"
+                images: "{}"
+                ingredient: "{}"
+                shippingCost: "{}"
+                productId: productId
+                expressType: "{}"
+                isOnsale: "{}"
+                nameEn: "{}"
+                storeId: "{}"
+                rrp: "{}"
+                taxRate: "{}"
+                grossWeight: "{}"
+                netWeight: "{}"
+                hsCode: "{}"
+                name: "{}"
+                category: "{}"
+                groupBuyingPrice: "{}"
+                categoryId: "{}"
+                status: status
+              quantity: 1
+              price: 0.8008281904610115
+              discount: "{}"
+              tax: "{}"
+            - product:
+                country: "{}"
+                skus:
+                - skuNumber: skuNumber
+                  barcode: barcode
+                - skuNumber: skuNumber
+                  barcode: barcode
+                description: "{}"
+                discount: "{}"
+                massUnit: massUnit
+                spec: "{}"
+                createdAt: "{}"
+                warrantyPeriod: 6
+                personalPostalArticlesTax: "{}"
+                price: "{}"
+                vendor: "{}"
+                logisticsMode: "{}"
+                currency: currency
+                model: "{}"
+                shippingTime: "{}"
+                shelfLife: "{}"
+                barcode: barcode
+                brand: brand
+                timeUnit: "{}"
+                updatedAt: "{}"
+                images: "{}"
+                ingredient: "{}"
+                shippingCost: "{}"
+                productId: productId
+                expressType: "{}"
+                isOnsale: "{}"
+                nameEn: "{}"
+                storeId: "{}"
+                rrp: "{}"
+                taxRate: "{}"
+                grossWeight: "{}"
+                netWeight: "{}"
+                hsCode: "{}"
+                name: "{}"
+                category: "{}"
+                groupBuyingPrice: "{}"
+                categoryId: "{}"
+                status: status
+              quantity: 1
+              price: 0.8008281904610115
+              discount: "{}"
+              tax: "{}"
+            customer: "{}"
+            customsCode: customsCode
+            nonCashDeductionAmount: "{}"
+            status: status
+        responseTime: 5
+        connectorResponses:
+        - "{}"
+        - "{}"
+        message: message
+      properties:
+        code:
+          format: int32
+          type: integer
+        connectorResponses:
+          items:
+            type: object
+          type: array
+        data:
+          $ref: '#/components/schemas/DataPayload'
+        message:
+          type: string
+        responseTime:
+          format: int32
+          type: integer
+      title: OdooResponse
+      type: object
+    DataPayload:
+      example:
+        orders:
+        - seller: "{}"
+          trackingReference: "{}"
+          orderType: orderType
+          orderId: "{}"
+          payMerchantName: "{}"
+          customerIdRef: "{}"
+          payer: "{}"
+          createdAt: createdAt
+          distributorName: "{}"
+          payAmount: 6.027456183070403
+          isDistributionOrder: true
+          payMethod: "{}"
+          customerNote: "{}"
+          expressCompany: "{}"
+          isSubOrder: true
+          currency: currency
+          platformName: platformName
+          updatedAt: updatedAt
+          shippingCost: "{}"
+          platformTransactionId: "{}"
+          expressType: "{}"
+          nodeCode: "{}"
+          clientParentOrderRef: "{}"
+          deliverySlipUrl: "{}"
+          payCustomsNo: "{}"
+          clientOrderRef: clientOrderRef
+          destinationCode: "{}"
+          customsFilingId: "{}"
+          insuranceFee: "{}"
+          productsTotalTax: 1.4658129805029452
+          paymentPayId: "{}"
+          paidAt: "{}"
+          payId: "{}"
+          items:
+          - product:
+              country: "{}"
+              skus:
+              - skuNumber: skuNumber
+                barcode: barcode
+              - skuNumber: skuNumber
+                barcode: barcode
+              description: "{}"
+              discount: "{}"
+              massUnit: massUnit
+              spec: "{}"
+              createdAt: "{}"
+              warrantyPeriod: 6
+              personalPostalArticlesTax: "{}"
+              price: "{}"
+              vendor: "{}"
+              logisticsMode: "{}"
+              currency: currency
+              model: "{}"
+              shippingTime: "{}"
+              shelfLife: "{}"
+              barcode: barcode
+              brand: brand
+              timeUnit: "{}"
+              updatedAt: "{}"
+              images: "{}"
+              ingredient: "{}"
+              shippingCost: "{}"
+              productId: productId
+              expressType: "{}"
+              isOnsale: "{}"
+              nameEn: "{}"
+              storeId: "{}"
+              rrp: "{}"
+              taxRate: "{}"
+              grossWeight: "{}"
+              netWeight: "{}"
+              hsCode: "{}"
+              name: "{}"
+              category: "{}"
+              groupBuyingPrice: "{}"
+              categoryId: "{}"
+              status: status
+            quantity: 1
+            price: 0.8008281904610115
+            discount: "{}"
+            tax: "{}"
+          - product:
+              country: "{}"
+              skus:
+              - skuNumber: skuNumber
+                barcode: barcode
+              - skuNumber: skuNumber
+                barcode: barcode
+              description: "{}"
+              discount: "{}"
+              massUnit: massUnit
+              spec: "{}"
+              createdAt: "{}"
+              warrantyPeriod: 6
+              personalPostalArticlesTax: "{}"
+              price: "{}"
+              vendor: "{}"
+              logisticsMode: "{}"
+              currency: currency
+              model: "{}"
+              shippingTime: "{}"
+              shelfLife: "{}"
+              barcode: barcode
+              brand: brand
+              timeUnit: "{}"
+              updatedAt: "{}"
+              images: "{}"
+              ingredient: "{}"
+              shippingCost: "{}"
+              productId: productId
+              expressType: "{}"
+              isOnsale: "{}"
+              nameEn: "{}"
+              storeId: "{}"
+              rrp: "{}"
+              taxRate: "{}"
+              grossWeight: "{}"
+              netWeight: "{}"
+              hsCode: "{}"
+              name: "{}"
+              category: "{}"
+              groupBuyingPrice: "{}"
+              categoryId: "{}"
+              status: status
+            quantity: 1
+            price: 0.8008281904610115
+            discount: "{}"
+            tax: "{}"
+          customer: "{}"
+          customsCode: customsCode
+          nonCashDeductionAmount: "{}"
+          status: status
+        - seller: "{}"
+          trackingReference: "{}"
+          orderType: orderType
+          orderId: "{}"
+          payMerchantName: "{}"
+          customerIdRef: "{}"
+          payer: "{}"
+          createdAt: createdAt
+          distributorName: "{}"
+          payAmount: 6.027456183070403
+          isDistributionOrder: true
+          payMethod: "{}"
+          customerNote: "{}"
+          expressCompany: "{}"
+          isSubOrder: true
+          currency: currency
+          platformName: platformName
+          updatedAt: updatedAt
+          shippingCost: "{}"
+          platformTransactionId: "{}"
+          expressType: "{}"
+          nodeCode: "{}"
+          clientParentOrderRef: "{}"
+          deliverySlipUrl: "{}"
+          payCustomsNo: "{}"
+          clientOrderRef: clientOrderRef
+          destinationCode: "{}"
+          customsFilingId: "{}"
+          insuranceFee: "{}"
+          productsTotalTax: 1.4658129805029452
+          paymentPayId: "{}"
+          paidAt: "{}"
+          payId: "{}"
+          items:
+          - product:
+              country: "{}"
+              skus:
+              - skuNumber: skuNumber
+                barcode: barcode
+              - skuNumber: skuNumber
+                barcode: barcode
+              description: "{}"
+              discount: "{}"
+              massUnit: massUnit
+              spec: "{}"
+              createdAt: "{}"
+              warrantyPeriod: 6
+              personalPostalArticlesTax: "{}"
+              price: "{}"
+              vendor: "{}"
+              logisticsMode: "{}"
+              currency: currency
+              model: "{}"
+              shippingTime: "{}"
+              shelfLife: "{}"
+              barcode: barcode
+              brand: brand
+              timeUnit: "{}"
+              updatedAt: "{}"
+              images: "{}"
+              ingredient: "{}"
+              shippingCost: "{}"
+              productId: productId
+              expressType: "{}"
+              isOnsale: "{}"
+              nameEn: "{}"
+              storeId: "{}"
+              rrp: "{}"
+              taxRate: "{}"
+              grossWeight: "{}"
+              netWeight: "{}"
+              hsCode: "{}"
+              name: "{}"
+              category: "{}"
+              groupBuyingPrice: "{}"
+              categoryId: "{}"
+              status: status
+            quantity: 1
+            price: 0.8008281904610115
+            discount: "{}"
+            tax: "{}"
+          - product:
+              country: "{}"
+              skus:
+              - skuNumber: skuNumber
+                barcode: barcode
+              - skuNumber: skuNumber
+                barcode: barcode
+              description: "{}"
+              discount: "{}"
+              massUnit: massUnit
+              spec: "{}"
+              createdAt: "{}"
+              warrantyPeriod: 6
+              personalPostalArticlesTax: "{}"
+              price: "{}"
+              vendor: "{}"
+              logisticsMode: "{}"
+              currency: currency
+              model: "{}"
+              shippingTime: "{}"
+              shelfLife: "{}"
+              barcode: barcode
+              brand: brand
+              timeUnit: "{}"
+              updatedAt: "{}"
+              images: "{}"
+              ingredient: "{}"
+              shippingCost: "{}"
+              productId: productId
+              expressType: "{}"
+              isOnsale: "{}"
+              nameEn: "{}"
+              storeId: "{}"
+              rrp: "{}"
+              taxRate: "{}"
+              grossWeight: "{}"
+              netWeight: "{}"
+              hsCode: "{}"
+              name: "{}"
+              category: "{}"
+              groupBuyingPrice: "{}"
+              categoryId: "{}"
+              status: status
+            quantity: 1
+            price: 0.8008281904610115
+            discount: "{}"
+            tax: "{}"
+          customer: "{}"
+          customsCode: customsCode
+          nonCashDeductionAmount: "{}"
+          status: status
+      properties:
+        orders:
+          items:
+            $ref: '#/components/schemas/OdooOrderDTO'
+          type: array
+      title: DataPayload
+      type: object
+    OdooOrderDTO:
+      example:
+        seller: "{}"
+        trackingReference: "{}"
+        orderType: orderType
+        orderId: "{}"
+        payMerchantName: "{}"
+        customerIdRef: "{}"
+        payer: "{}"
+        createdAt: createdAt
+        distributorName: "{}"
+        payAmount: 6.027456183070403
+        isDistributionOrder: true
+        payMethod: "{}"
+        customerNote: "{}"
+        expressCompany: "{}"
+        isSubOrder: true
+        currency: currency
+        platformName: platformName
+        updatedAt: updatedAt
+        shippingCost: "{}"
+        platformTransactionId: "{}"
+        expressType: "{}"
+        nodeCode: "{}"
+        clientParentOrderRef: "{}"
+        deliverySlipUrl: "{}"
+        payCustomsNo: "{}"
+        clientOrderRef: clientOrderRef
+        destinationCode: "{}"
+        customsFilingId: "{}"
+        insuranceFee: "{}"
+        productsTotalTax: 1.4658129805029452
+        paymentPayId: "{}"
+        paidAt: "{}"
+        payId: "{}"
+        items:
+        - product:
+            country: "{}"
+            skus:
+            - skuNumber: skuNumber
+              barcode: barcode
+            - skuNumber: skuNumber
+              barcode: barcode
+            description: "{}"
+            discount: "{}"
+            massUnit: massUnit
+            spec: "{}"
+            createdAt: "{}"
+            warrantyPeriod: 6
+            personalPostalArticlesTax: "{}"
+            price: "{}"
+            vendor: "{}"
+            logisticsMode: "{}"
+            currency: currency
+            model: "{}"
+            shippingTime: "{}"
+            shelfLife: "{}"
+            barcode: barcode
+            brand: brand
+            timeUnit: "{}"
+            updatedAt: "{}"
+            images: "{}"
+            ingredient: "{}"
+            shippingCost: "{}"
+            productId: productId
+            expressType: "{}"
+            isOnsale: "{}"
+            nameEn: "{}"
+            storeId: "{}"
+            rrp: "{}"
+            taxRate: "{}"
+            grossWeight: "{}"
+            netWeight: "{}"
+            hsCode: "{}"
+            name: "{}"
+            category: "{}"
+            groupBuyingPrice: "{}"
+            categoryId: "{}"
+            status: status
+          quantity: 1
+          price: 0.8008281904610115
+          discount: "{}"
+          tax: "{}"
+        - product:
+            country: "{}"
+            skus:
+            - skuNumber: skuNumber
+              barcode: barcode
+            - skuNumber: skuNumber
+              barcode: barcode
+            description: "{}"
+            discount: "{}"
+            massUnit: massUnit
+            spec: "{}"
+            createdAt: "{}"
+            warrantyPeriod: 6
+            personalPostalArticlesTax: "{}"
+            price: "{}"
+            vendor: "{}"
+            logisticsMode: "{}"
+            currency: currency
+            model: "{}"
+            shippingTime: "{}"
+            shelfLife: "{}"
+            barcode: barcode
+            brand: brand
+            timeUnit: "{}"
+            updatedAt: "{}"
+            images: "{}"
+            ingredient: "{}"
+            shippingCost: "{}"
+            productId: productId
+            expressType: "{}"
+            isOnsale: "{}"
+            nameEn: "{}"
+            storeId: "{}"
+            rrp: "{}"
+            taxRate: "{}"
+            grossWeight: "{}"
+            netWeight: "{}"
+            hsCode: "{}"
+            name: "{}"
+            category: "{}"
+            groupBuyingPrice: "{}"
+            categoryId: "{}"
+            status: status
+          quantity: 1
+          price: 0.8008281904610115
+          discount: "{}"
+          tax: "{}"
+        customer: "{}"
+        customsCode: customsCode
+        nonCashDeductionAmount: "{}"
+        status: status
+      properties:
+        clientOrderRef:
+          type: string
+        clientParentOrderRef:
+          type: object
+        createdAt:
+          type: string
+        currency:
+          type: string
+        customer:
+          type: object
+        customerIdRef:
+          type: object
+        customerNote:
+          type: object
+        customsCode:
+          type: string
+        customsFilingId:
+          type: object
+        deliverySlipUrl:
+          type: object
+        destinationCode:
+          type: object
+        distributorName:
+          type: object
+        expressCompany:
+          type: object
+        expressType:
+          type: object
+        insuranceFee:
+          type: object
+        isDistributionOrder:
+          type: boolean
+        isSubOrder:
+          type: boolean
+        items:
+          items:
+            $ref: '#/components/schemas/Item'
+          type: array
+        nodeCode:
+          type: object
+        nonCashDeductionAmount:
+          type: object
+        orderId:
+          type: object
+        orderType:
+          type: string
+        paidAt:
+          type: object
+        payAmount:
+          format: double
+          type: number
+        payCustomsNo:
+          type: object
+        payId:
+          type: object
+        payMerchantName:
+          type: object
+        payMethod:
+          type: object
+        payer:
+          type: object
+        paymentPayId:
+          type: object
+        platformName:
+          type: string
+        platformTransactionId:
+          type: object
+        productsTotalTax:
+          format: double
+          type: number
+        seller:
+          type: object
+        shippingCost:
+          type: object
+        status:
+          type: string
+        trackingReference:
+          type: object
+        updatedAt:
+          type: string
+      title: OdooOrderDTO
+      type: object
+    Order:
+      example:
+        deliveryPhone: deliveryPhone
+        productTax: 7
+        totalProductAmount: 4
+        successRedirectUrl: successRedirectUrl
+        outerUserId: outerUserId
+        deliveryEmail: deliveryEmail
+        deliveryWaybillId: deliveryWaybillId
+        discount: 2
+        couponInstanceId: 5
+        platform: platform
+        addressId: 6
+        createTimestamp: createTimestamp
+        products:
+        - quantity: 2
+          productId: productId
+          discount: 9
+          tax: 7
+          productName: productName
+          spec: spec
+          rrp: 4
+          taxRate: 1.2315135367772556
+          outerProductId: outerProductId
+          outerSkuId: outerSkuId
+          price: 3
+          imageUrl: imageUrl
+          currency: currency
+          barcode: barcode
+          skuId: skuId
+        - quantity: 2
+          productId: productId
+          discount: 9
+          tax: 7
+          productName: productName
+          spec: spec
+          rrp: 4
+          taxRate: 1.2315135367772556
+          outerProductId: outerProductId
+          outerSkuId: outerSkuId
+          price: 3
+          imageUrl: imageUrl
+          currency: currency
+          barcode: barcode
+          skuId: skuId
+        deliveryUserIdCard: deliveryUserIdCard
+        outerOrderId: outerOrderId
+        shippingTax: 1
+        total: 1
+        deliveryAddress: deliveryAddress
+        parentOrderId: parentOrderId
+        customsClearanceType: customsClearanceType
+        currency: currency
+        id: id
+        declareUserName: declareUserName
+        deliveryCarrierId: deliveryCarrierId
+        deliveryPhoneCountryCode: deliveryPhoneCountryCode
+        campaignId: 5
+        cartId: cartId
+        campaignTrackingData: campaignTrackingData
+        deliveryExpressCompany: deliveryExpressCompany
+        tax: 7
+        storeId: storeId
+        userId: userId
+        updateTimestamp: updateTimestamp
+        paidTimestamp: paidTimestamp
+        cancelUrl: cancelUrl
+        areaId: 1
+        deliveryUserName: deliveryUserName
+        discountCode: discountCode
+        shippingFee: 1
+        notifyUrl: notifyUrl
+        comment: comment
+        status: 6
+      properties:
+        addressId:
+          format: int32
+          type: integer
+        areaId:
+          format: int32
+          type: integer
+        campaignId:
+          format: int32
+          type: integer
+        campaignTrackingData:
+          type: string
+        cancelUrl:
+          type: string
+        cartId:
+          type: string
+        comment:
+          type: string
+        couponInstanceId:
+          format: int64
+          type: integer
+        createTimestamp:
+          type: string
+        currency:
+          type: string
+        customsClearanceType:
+          type: string
+        declareUserName:
+          type: string
+        deliveryAddress:
+          type: string
+        deliveryCarrierId:
+          type: string
+        deliveryEmail:
+          type: string
+        deliveryExpressCompany:
+          type: string
+        deliveryPhone:
+          type: string
+        deliveryPhoneCountryCode:
+          type: string
+        deliveryUserIdCard:
+          type: string
+        deliveryUserName:
+          type: string
+        deliveryWaybillId:
+          type: string
+        discount:
+          format: int32
+          type: integer
+        discountCode:
+          type: string
+        id:
+          type: string
+        notifyUrl:
+          type: string
+        outerOrderId:
+          type: string
+        outerUserId:
+          type: string
+        paidTimestamp:
+          type: string
+        parentOrderId:
+          type: string
+        platform:
+          type: string
+        productTax:
+          format: int32
+          type: integer
+        products:
+          items:
+            $ref: '#/components/schemas/ProductDTO'
+          type: array
+        shippingFee:
+          format: int32
+          type: integer
+        shippingTax:
+          format: int32
+          type: integer
+        status:
+          format: int32
+          type: integer
+        storeId:
+          type: string
+        successRedirectUrl:
+          type: string
+        tax:
+          format: int32
+          type: integer
+        total:
+          format: int32
+          type: integer
+        totalProductAmount:
+          format: int32
+          type: integer
+        updateTimestamp:
+          type: string
+        userId:
+          type: string
+      title: Order
+      type: object
+    Payer:
+      example:
+        chineseId: chineseId
+        country: country
+        firstName: firstName
+        countryCode: countryCode
+        tin: tin
+      properties:
+        chineseId:
+          type: string
+        country:
+          type: string
+        countryCode:
+          type: string
+        firstName:
+          type: string
+        tin:
+          type: string
+      title: Payer
+      type: object
+    PilotResponse:
+      example:
+        code: 0
+        data:
+          trackingReference: trackingReference
+          trackingUrl: trackingUrl
+          waybillId: waybillId
+          deliverySlipUrl: deliverySlipUrl
+          domesticDeliveryCompany: domesticDeliveryCompany
+          deliveryStatus: deliveryStatus
+        errorMessage: errorMessage
+        message: message
+      properties:
+        code:
+          format: int32
+          type: integer
+        data:
+          $ref: '#/components/schemas/LoadData'
+        errorMessage:
+          type: string
+        message:
+          type: string
+      title: PilotResponse
+      type: object
+    Product:
+      example:
+        country: "{}"
+        skus:
+        - skuNumber: skuNumber
+          barcode: barcode
+        - skuNumber: skuNumber
+          barcode: barcode
+        description: "{}"
+        discount: "{}"
+        massUnit: massUnit
+        spec: "{}"
+        createdAt: "{}"
+        warrantyPeriod: 6
+        personalPostalArticlesTax: "{}"
+        price: "{}"
+        vendor: "{}"
+        logisticsMode: "{}"
+        currency: currency
+        model: "{}"
+        shippingTime: "{}"
+        shelfLife: "{}"
+        barcode: barcode
+        brand: brand
+        timeUnit: "{}"
+        updatedAt: "{}"
+        images: "{}"
+        ingredient: "{}"
+        shippingCost: "{}"
+        productId: productId
+        expressType: "{}"
+        isOnsale: "{}"
+        nameEn: "{}"
+        storeId: "{}"
+        rrp: "{}"
+        taxRate: "{}"
+        grossWeight: "{}"
+        netWeight: "{}"
+        hsCode: "{}"
+        name: "{}"
+        category: "{}"
+        groupBuyingPrice: "{}"
+        categoryId: "{}"
+        status: status
+      properties:
+        barcode:
+          type: string
+        brand:
+          type: string
+        category:
+          type: object
+        categoryId:
+          type: object
+        country:
+          type: object
+        createdAt:
+          type: object
+        currency:
+          type: string
+        description:
+          type: object
+        discount:
+          type: object
+        expressType:
+          type: object
+        grossWeight:
+          type: object
+        groupBuyingPrice:
+          type: object
+        hsCode:
+          type: object
+        images:
+          type: object
+        ingredient:
+          type: object
+        isOnsale:
+          type: object
+        logisticsMode:
+          type: object
+        massUnit:
+          type: string
+        model:
+          type: object
+        name:
+          type: object
+        nameEn:
+          type: object
+        netWeight:
+          type: object
+        personalPostalArticlesTax:
+          type: object
+        price:
+          type: object
+        productId:
+          type: string
+        rrp:
+          type: object
+        shelfLife:
+          type: object
+        shippingCost:
+          type: object
+        shippingTime:
+          type: object
+        skus:
+          items:
+            $ref: '#/components/schemas/Sku'
+          type: array
+        spec:
+          type: object
+        status:
+          type: string
+        storeId:
+          type: object
+        taxRate:
+          type: object
+        timeUnit:
+          type: object
+        updatedAt:
+          type: object
+        vendor:
+          type: object
+        warrantyPeriod:
+          format: int32
+          type: integer
+      title: Product
+      type: object
+    ProductDTO:
+      example:
+        quantity: 2
+        productId: productId
+        discount: 9
+        tax: 7
+        productName: productName
+        spec: spec
+        rrp: 4
+        taxRate: 1.2315135367772556
+        outerProductId: outerProductId
+        outerSkuId: outerSkuId
+        price: 3
+        imageUrl: imageUrl
+        currency: currency
+        barcode: barcode
+        skuId: skuId
+      properties:
+        barcode:
+          type: string
+        currency:
+          type: string
+        discount:
+          format: int32
+          type: integer
+        imageUrl:
+          type: string
+        outerProductId:
+          type: string
+        outerSkuId:
+          type: string
+        price:
+          format: int32
+          type: integer
+        productId:
+          type: string
+        productName:
+          type: string
+        quantity:
+          format: int32
+          type: integer
+        rrp:
+          format: int32
+          type: integer
+        skuId:
+          type: string
+        spec:
+          type: string
+        tax:
+          format: int32
+          type: integer
+        taxRate:
+          format: double
+          type: number
+      title: ProductDTO
+      type: object
+    RangerCreateOrderCommand:
+      example:
+        orderType: orderType
+        payMerchantName: payMerchantName
+        customerIdRef: customerIdRef
+        deliveryWaybillId: deliveryWaybillId
+        payer:
+          chineseId: chineseId
+          country: country
+          firstName: firstName
+          countryCode: countryCode
+          tin: tin
+        totalTax: 9.301444243932576
+        createdAt: createdAt
+        distributorName: distributorName
+        shippingTax: 7.061401241503109
+        payAmount: 5.637376656633329
+        isDistributionOrder: true
+        payMethod: payMethod
+        expressCompany: expressCompany
+        isSubOrder: true
+        currency: currency
+        platformName: platformName
+        updatedAt: updatedAt
+        shippingCost: 2.3021358869347655
+        platformTransactionId: platformTransactionId
+        deliveryWaybillError: deliveryWaybillError
+        expressType: expressType
+        clientParentOrderRef: clientParentOrderRef
+        storeId: storeId
+        clientOrderRef: clientOrderRef
+        paymentPayId: paymentPayId
+        paidAt: paidAt
+        payId: payId
+        items:
+        - product:
+            country: "{}"
+            skus:
+            - skuNumber: skuNumber
+              barcode: barcode
+            - skuNumber: skuNumber
+              barcode: barcode
+            description: "{}"
+            discount: "{}"
+            massUnit: massUnit
+            spec: "{}"
+            createdAt: "{}"
+            warrantyPeriod: 6
+            personalPostalArticlesTax: "{}"
+            price: "{}"
+            vendor: "{}"
+            logisticsMode: "{}"
+            currency: currency
+            model: "{}"
+            shippingTime: "{}"
+            shelfLife: "{}"
+            barcode: barcode
+            brand: brand
+            timeUnit: "{}"
+            updatedAt: "{}"
+            images: "{}"
+            ingredient: "{}"
+            shippingCost: "{}"
+            productId: productId
+            expressType: "{}"
+            isOnsale: "{}"
+            nameEn: "{}"
+            storeId: "{}"
+            rrp: "{}"
+            taxRate: "{}"
+            grossWeight: "{}"
+            netWeight: "{}"
+            hsCode: "{}"
+            name: "{}"
+            category: "{}"
+            groupBuyingPrice: "{}"
+            categoryId: "{}"
+            status: status
+          quantity: 1
+          price: 0.8008281904610115
+          discount: "{}"
+          tax: "{}"
+        - product:
+            country: "{}"
+            skus:
+            - skuNumber: skuNumber
+              barcode: barcode
+            - skuNumber: skuNumber
+              barcode: barcode
+            description: "{}"
+            discount: "{}"
+            massUnit: massUnit
+            spec: "{}"
+            createdAt: "{}"
+            warrantyPeriod: 6
+            personalPostalArticlesTax: "{}"
+            price: "{}"
+            vendor: "{}"
+            logisticsMode: "{}"
+            currency: currency
+            model: "{}"
+            shippingTime: "{}"
+            shelfLife: "{}"
+            barcode: barcode
+            brand: brand
+            timeUnit: "{}"
+            updatedAt: "{}"
+            images: "{}"
+            ingredient: "{}"
+            shippingCost: "{}"
+            productId: productId
+            expressType: "{}"
+            isOnsale: "{}"
+            nameEn: "{}"
+            storeId: "{}"
+            rrp: "{}"
+            taxRate: "{}"
+            grossWeight: "{}"
+            netWeight: "{}"
+            hsCode: "{}"
+            name: "{}"
+            category: "{}"
+            groupBuyingPrice: "{}"
+            categoryId: "{}"
+            status: status
+          quantity: 1
+          price: 0.8008281904610115
+          discount: "{}"
+          tax: "{}"
+        customer:
+          zip: zip
+          country: country
+          firstName: firstName
+          lastName: lastName
+          address2: address2
+          city: city
+          phone: phone
+          address1: address1
+          countryCode: countryCode
+          state: state
+          email: email
+        customsCode: customsCode
+        nonCashDeductionAmount: 5.962133916683182
+        status: status
+      properties:
+        clientOrderRef:
+          type: string
+        clientParentOrderRef:
+          type: string
+        createdAt:
+          type: string
+        currency:
+          type: string
+        customer:
+          $ref: '#/components/schemas/Customer'
+        customerIdRef:
+          type: string
+        customsCode:
+          type: string
+        deliveryWaybillError:
+          type: string
+        deliveryWaybillId:
+          type: string
+        distributorName:
+          type: string
+        expressCompany:
+          type: string
+        expressType:
+          type: string
+        isDistributionOrder:
+          type: boolean
+        isSubOrder:
+          type: boolean
+        items:
+          items:
+            $ref: '#/components/schemas/Item'
+          type: array
+        nonCashDeductionAmount:
+          format: double
+          type: number
+        orderType:
+          type: string
+        paidAt:
+          type: string
+        payAmount:
+          format: double
+          type: number
+        payId:
+          type: string
+        payMerchantName:
+          type: string
+        payMethod:
+          type: string
+        payer:
+          $ref: '#/components/schemas/Payer'
+        paymentPayId:
+          type: string
+        platformName:
+          type: string
+        platformTransactionId:
+          type: string
+        shippingCost:
+          format: double
+          type: number
+        shippingTax:
+          format: double
+          type: number
+        status:
+          type: string
+        storeId:
+          type: string
+        totalTax:
+          format: double
+          type: number
+        updatedAt:
+          type: string
+      title: RangerCreateOrderCommand
+      type: object
+    Sku:
+      example:
+        skuNumber: skuNumber
+        barcode: barcode
+      properties:
+        barcode:
+          type: string
+        skuNumber:
+          type: string
+      title: Sku
+      type: object
+  securitySchemes:
+    Authorization:
+      in: header
+      name: Authorization
+      type: apiKey
